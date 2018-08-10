@@ -1,5 +1,6 @@
 package org.thoughtcrime.securesms.jobmanager;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -10,9 +11,10 @@ import org.thoughtcrime.securesms.jobs.requirements.SqlCipherMigrationRequiremen
 import org.thoughtcrime.securesms.logging.Log;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 import androidx.work.Data;
-import androidx.work.WorkManager;
+import androidx.work.State;
 import androidx.work.Worker;
 
 public abstract class Job extends Worker implements Serializable {
@@ -28,6 +30,9 @@ public abstract class Job extends Worker implements Serializable {
 
   private final JobParameters jobParameters;
 
+  /**
+   * Invoked when a job is first created in our own codebase.
+   */
   protected Job(@Nullable JobParameters jobParameters) {
     this.jobParameters = jobParameters;
   }
@@ -124,14 +129,14 @@ public abstract class Job extends Worker implements Serializable {
     return jobParameters;
   }
 
-  private Result cancel() {
-    onCanceled();
-    return Result.FAILURE;
-  }
-
   private Result retry() {
     onRetry();
     return Result.RETRY;
+  }
+
+  private Result cancel() {
+    onCanceled();
+    return Result.SUCCESS;
   }
 
   private boolean requirementsMet(Data data) {

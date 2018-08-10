@@ -68,6 +68,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import androidx.work.WorkManager;
 import dagger.ObjectGraph;
 
 /**
@@ -164,7 +165,7 @@ public class ApplicationContext extends MultiDexApplication implements Dependenc
   }
 
   private void initializeJobManager() {
-    this.jobManager = new JobManager();
+    this.jobManager = new JobManager(this, WorkManager.getInstance());
   }
 
   private void initializeDependencyInjection() {

@@ -15,7 +15,6 @@ import org.thoughtcrime.securesms.database.Address;
 import org.thoughtcrime.securesms.database.DatabaseFactory;
 import org.thoughtcrime.securesms.events.PartProgressEvent;
 import org.thoughtcrime.securesms.jobmanager.JobParameters;
-import org.thoughtcrime.securesms.jobs.requirements.MasterSecretRequirement;
 import org.thoughtcrime.securesms.logging.Log;
 import org.thoughtcrime.securesms.mms.DecryptableStreamUriLoader;
 import org.thoughtcrime.securesms.mms.OutgoingMediaMessage;
@@ -52,6 +51,7 @@ public abstract class PushSendJob extends SendJob {
     JobParameters.Builder builder = JobParameters.newBuilder();
     builder.withGroupId(destination.serialize());
     builder.withMasterSecretRequirement();
+    builder.withNetworkRequirement();
     builder.withRetryDuration(TimeUnit.DAYS.toMillis(1));
 
     return builder.create();

@@ -1,5 +1,11 @@
 package org.thoughtcrime.securesms.jobmanager;
 
+import android.annotation.SuppressLint;
+import android.arch.lifecycle.LiveData;
+import android.content.Context;
+import android.support.annotation.NonNull;
+
+import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -9,6 +15,8 @@ import androidx.work.ExistingWorkPolicy;
 import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
+import androidx.work.WorkStatus;
+import androidx.work.impl.WorkDatabase;
 
 public class JobManager {
 
@@ -18,10 +26,16 @@ public class JobManager {
 
   private final Executor executor = Executors.newSingleThreadExecutor();
 
+  private final Context     context;
+  private final WorkManager workManager;
+
+  public JobManager(@NonNull Context context, @NonNull WorkManager workManager) {
+    this.context      = context.getApplicationContext();
+    this.workManager  = workManager;
+  }
+
   public void add(Job job) {
     executor.execute(() -> {
-      job.onAdded();
-
       Data.Builder dataBuilder = new Data.Builder().putInt(Job.KEY_RETRY_COUNT, getRetryCount(job))
                                                    .putLong(Job.KEY_RETRY_UNTIL, getRetryUntil(job))
                                                    .putBoolean(Job.KEY_REQUIRES_MASTER_SECRET, getRequiresMasterSecret(job))
@@ -34,13 +48,21 @@ public class JobManager {
         requestBuilder.setConstraints(NETWORK_CONSTRAINT);
       }
 
+      OneTimeWorkRequest request = requestBuilder.build();
+
+      job.onAdded();
+
       String groupId = getGroupId(job);
       if (groupId != null) {
-        WorkManager.getInstance().beginUniqueWork(groupId, ExistingWorkPolicy.APPEND, requestBuilder.build()).enqueue();
+        workManager.beginUniqueWork(groupId, ExistingWorkPolicy.APPEND, request).enqueue();
       } else {
-        WorkManager.getInstance().beginWith(requestBuilder.build()).enqueue();
+        workManager.beginWith(request).enqueue();
       }
     });
+  }
+
+  public LiveData<WorkStatus> getState(UUID jobId) {
+    return workManager.getStatusById(jobId);
   }
 
   private int getRetryCount(Job job) {

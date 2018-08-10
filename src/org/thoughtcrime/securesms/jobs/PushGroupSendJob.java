@@ -71,6 +71,7 @@ public class PushGroupSendJob extends PushSendJob implements InjectableType {
     super(context, JobParameters.newBuilder()
                                 .withGroupId(destination.toGroupString())
                                 .withMasterSecretRequirement()
+                                .withNetworkRequirement()
                                 .withRetryDuration(TimeUnit.DAYS.toMillis(1))
                                 .create());
 
