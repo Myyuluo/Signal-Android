@@ -18,7 +18,9 @@ package org.thoughtcrime.securesms.jobmanager;
 
 import android.os.PowerManager;
 
+import org.thoughtcrime.securesms.ApplicationContext;
 import org.thoughtcrime.securesms.jobmanager.requirements.Requirement;
+import org.thoughtcrime.securesms.service.GenericForegroundService;
 
 import java.io.Serializable;
 import java.util.List;
@@ -127,6 +129,13 @@ public abstract class Job implements Serializable {
    * the state has been persisted to disk before this method is called.
    */
   public abstract void onAdded();
+
+  public void run() throws Exception {
+    GenericForegroundService.startForegroundTask(ApplicationContext.get(), "Idk");
+//    Thread.sleep(5000);
+    onRun();
+    GenericForegroundService.stopForegroundTask(ApplicationContext.get());
+  }
 
   /**
    * Called to actually execute the job.

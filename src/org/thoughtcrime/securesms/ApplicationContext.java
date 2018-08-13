@@ -93,9 +93,15 @@ public class ApplicationContext extends MultiDexApplication implements Dependenc
     return (ApplicationContext)context.getApplicationContext();
   }
 
+  private static Context context;
+  public static Context get() {
+    return context;
+  }
+
   @Override
   public void onCreate() {
     super.onCreate();
+    context = this;
     initializeRandomNumberFix();
     initializeLogging();
     initializeCrashHandling();

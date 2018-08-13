@@ -3,6 +3,10 @@ package org.thoughtcrime.securesms.service;
 
 import android.app.PendingIntent;
 import android.app.Service;
+import android.arch.lifecycle.DefaultLifecycleObserver;
+import android.arch.lifecycle.LifecycleObserver;
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.ProcessLifecycleOwner;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
@@ -29,7 +33,19 @@ public class GenericForegroundService extends Service {
 
   @Override
   public void onCreate() {
+    ProcessLifecycleOwner.get().getLifecycle().addObserver(new DefaultLifecycleObserver() {
+      @Override
+      public void onStart(@NonNull LifecycleOwner owner) {
 
+      }
+
+      @Override
+      public void onStop(@NonNull LifecycleOwner owner) {
+        if (foregroundCount.get() > 0) {
+
+        }
+      }
+    });
   }
 
   @Override
