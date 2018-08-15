@@ -132,9 +132,12 @@ public abstract class Job implements Serializable {
 
   public void run() throws Exception {
     GenericForegroundService.startForegroundTask(ApplicationContext.get(), "Idk");
-//    Thread.sleep(5000);
-    onRun();
-    GenericForegroundService.stopForegroundTask(ApplicationContext.get());
+    try {
+      Thread.sleep(5000);
+      onRun();
+    } finally {
+      GenericForegroundService.stopForegroundTask(ApplicationContext.get());
+    }
   }
 
   /**
